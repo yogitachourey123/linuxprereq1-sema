@@ -31,4 +31,3 @@
 
     - name: Grow XFS filesystem
       command: "xfs_growfs {{ rl_path }}/{{ opt_var }}"
-	  
