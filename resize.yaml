@@ -1,56 +1,44 @@
 ---
 - name: Resize directory
-  hosts: all
-  tasks:
-    - name: Check if machine name contains m5$
-      command: "echo $machineName | grep -iq m5$"
-      register: m5_check
+hosts: all
+tasks:
+  - name: Check if machine name contains m5$
+    command: "echo $machineName | grep -iq m5$"
+    register: m5_check
 
-    - name: Check if machine name contains bis$
-      command: "echo $machineName | grep -iq bis$"
-      register: bis_check
+  - name: Check if machine name contains bis$
+    command: "echo $machineName | grep -iq bis$"
+    register: bis_check
 
-    - name: Set OPT_VAR to var if machine name contains m5$ or bis$
-      set_fact:
-        OPT_VAR: "var"
-      when:
-        - "m5_check.stdout == '1'"
-        - "bis_check.stdout == '1'"
+  - name: Set OPT_VAR to var if machine name contains m5$ or bis$
+    set_fact:
+      OPT_VAR: "var"
+    when:
+      - "m5_check.stdout == '1'"
+      - "bis_check.stdout == '1'"
 
-    - name: Check if /dev/rl exists
-      command: "test -d /dev/rl"
-      register: rl_check
+  - name: Check if /dev/rl exists
+    command: "test -d /dev/rl"
+    register: rl_check
 
-    - name: Set RL_PATH to /dev/rl if it exists
-      set_fact:
-       rl_path: "/dev/rl"
-      when:
-       - "rl_check.stdout == 0"
+  - name: Set RL_PATH to /dev/rl if it exists
+    set_fact:
+      rl_path: "/dev/rl"
+    when:
+      - "rl_check.stdout == 0"
 
-    - name: Check if /dev/rl_microservices exists
-      command: "test -d /dev/rl_microservices"
-      register: rl_microservices_check
+  - name: Check if /dev/rl_microservices exists
+    command: "test -d /dev/rl_microservices"
+    register: rl_microservices_check
 
-    - name: Set RL_PATH to /dev/rl_microservices if it exists and RL_PATH is not set
-      set_fact:
-       rl_path: "/dev/rl_microservices"
-      when:
-       - "rl_microservices_check.stdout == 0"
-       - "rl_path == ''"
+  - name: Set RL_PATH to /dev/rl_microservices if it exists
+    set_fact:
+      rl_path: "/dev/rl_microservices"
+    when:
+      - rl_microservices_check.stdout == 0
 
-    - name: Check if /dev/rocky exists
-      command: "test -d /dev/rocky"
-      register: rocky_check
+  - name: Extend logical volume
+    command: "lvextend -L {{ fs_size }} {{ rl_path }}"
 
-    - name: Set RL_PATH to /dev/rocky if it exists and RL_PATH is not set
-      set_fact:
-        rl_path: "/dev/rocky"
-      when:
-       - "rocky_check.stdout == 0"
-       - "rl_path == ''"
-
-    - name: Extend logical volume
-      command: "lvextend -L {{ fs_size }} {{ rl_path }}"
-
-    - name: Grow XFS filesystem
-      command: "xfs_growfs {{ rl_path }}"
+  - name: Grow XFS filesystem
+    command: "xfs_growfs {{ rl_path }}"
