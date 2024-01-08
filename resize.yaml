@@ -24,8 +24,8 @@
       rl_path: "/dev/rl"
       when:
         - "/dev/rl" in lookup('fileglob', '/dev/*')"
-        - "/dev/rl_microservices" not in lookup('fileglob', '/dev/*')"
-        - "/dev/rocky" not in lookup('fileglob', '/dev/*')"
+        - '/dev/rl_microservices' not in lookup('fileglob', '/dev/*')"
+        - '/dev/rocky' not in lookup('fileglob', '/dev/*')"
 
   - name: Check RL_PATH and exit if not found
     fail:
