@@ -2,24 +2,32 @@
 - name: Resize directory
   hosts: all
   tasks:
-    - name: Gather machine name
+    - name: Get machine name
       command: "hostname -s"
-      register: machine_name 
-    - name: Initialize OPT_VAR to opt
-      set_fact:
-        opt_var: "opt"
+      register: machine_name
     - name: Determine OPT_VAR
       set_fact:
-        opt_var: "var"
-      when:
-        - "machine_name.stdout | regex_search('m5$', ignorecase=True) or machine_name.stdout | regex_search('bis$', ignorecase=True)"
+        opt_var: "opt"
+       when:
+         - "'m5$' in machine_name.stdout"
+         - "'bis$' in machine_name.stdout"
     - name: Determine RL_PATH
       set_fact:
         rl_path: "/dev/rl"
+      when: "'/dev/rl' in lookup('fileglob', '/dev/*')"
+      register: rl_path_check
+    - name: Set RL_PATH to rl_microservices if rl_path is not set
+      set_fact:
+        rl_path: "/dev/rl_microservices"
       when:
-        - "'/dev/rl' in lookup('fileglob', '/dev/*')"
+        - "rl_path == ''"
+        - "'/dev/rl_microservices' in lookup('fileglob', '/dev/*')"
+    - name: Set RL_PATH to rocky if rl_path is not set and rl_microservices is not set
+      set_fact:
+        rl_path: "/dev/rocky"
+      when:
+        - "rl_path == ''"
         - "'/dev/rl_microservices' not in lookup('fileglob', '/dev/*')"
-        - "'/dev/rocky' not in lookup('fileglob', '/dev/*')"
     - name: Check RL_PATH and exit if not found
       fail:
         msg: "RL path not found"
