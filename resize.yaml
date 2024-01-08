@@ -1,6 +1,6 @@
 ---
 - name: Resize directory
- hosts: all
+  hosts: all
 
  tasks:
   - name: Gather machine name
