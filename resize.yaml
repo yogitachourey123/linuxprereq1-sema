@@ -1,0 +1,26 @@
+---
+- name: Resize directory
+  hosts: all
+  
+  tasks:
+    - name: Initialize OPT_VAR to opt
+      set_fact:
+        opt_var: "opt"
+
+    - name: Determine OPT_VAR
+      set_fact:
+        opt_var: "var"
+      when: "machine_name.stdout | regex_search('m5$', ignorecase=True) or machine_name.stdout | regex_search('bis$', ignorecase=True)"
+
+    - name: Determine RL_PATH
+      set_fact:
+        rl_path: "/dev/rl"
+      when:
+        - "'/dev/rl' in lookup('fileglob', '/dev/*')"
+        - "'/dev/rl_microservices' not in lookup('fileglob', '/dev/*')"
+        - "'/dev/rocky' not in lookup('fileglob', '/dev/*')"
+
+    - name: Extend logical volume and grow filesystem
+      lvolextend:
+        logical_volume={{ rl_path }}/{{ opt_var }}
+        size="{{ f_size }}"
