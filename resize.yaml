@@ -4,37 +4,40 @@
   tasks:
     - name: Check for available RL paths
       block:
-      - name: Set RL_PATH to /dev/rl if it exists
-        set_fact:
-          rl_path: "/dev/rl"
-        when:
-          - shell: "test -d /dev/rl"
-            register: rl_exists
-            changed_when: false
-          - rl_exists.rc == 0
+        - name: Check if /dev/rl exists
+          shell: "test -d /dev/rl"
+          register: rl_exists
+          changed_when: false
 
-      - name: Set RL_PATH to /dev/rl_microservices if it exists
-        set_fact:
-          rl_path: "/dev/rl_microservices"
-        when:
-          - shell: "test -d /dev/rl_microservices"
-            register: rl_microservices_exists
-            changed_when: false
-          - rl_microservices_exists.rc == 0
+        - name: Set RL_PATH to /dev/rl if it exists
+          set_fact:
+            rl_path: "/dev/rl"
+          when: rl_exists.rc == 0
 
-      - name: Set RL_PATH to /dev/rocky if it exists
-        set_fact:
-          rl_path: "/dev/rocky"
-        when:
-          - shell: "test -d /dev/rocky"
-            register: rocky_exists
-            changed_when: false
-          - rocky_exists.rc == 0
+        - name: Check if /dev/rl_microservices exists
+          shell: "test -d /dev/rl_microservices"
+          register: rl_microservices_exists
+          changed_when: false
 
-      - name: Fail if no RL path found
-        fail:
-          msg: "RL path not found"
-        when: rl_path == ''
+        - name: Set RL_PATH to /dev/rl_microservices if it exists
+          set_fact:
+            rl_path: "/dev/rl_microservices"
+          when: rl_microservices_exists.rc == 0
+
+        - name: Check if /dev/rocky exists
+          shell: "test -d /dev/rocky"
+          register: rocky_exists
+          changed_when: false
+
+        - name: Set RL_PATH to /dev/rocky if it exists
+          set_fact:
+            rl_path: "/dev/rocky"
+          when: rocky_exists.rc == 0
+
+        - name: Fail if no RL path found
+          fail:
+            msg: "RL path not found"
+          when: rl_path == ''
 
     - name: Extend logical volume
       command: "lvextend -L {{ fs_size }} {{ rl_path }}"
