@@ -50,7 +50,7 @@
     - "rl_path == ''"
 
 - name: Extend logical volume
-  command: "lvextend -L {{ fs_size }}" "{{ rl_path }}"
+  command: "lvextend -L {{ fs_size }} {{ rl_path }}"
 
 - name: Grow XFS filesystem
   command: "xfs_growfs {{ rl_path }}"
