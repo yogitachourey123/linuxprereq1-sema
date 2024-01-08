@@ -1,7 +1,7 @@
 ---
 - name: Resize directory
   hosts: all
-  
+
   tasks:
     - name: Initialize OPT_VAR to opt
       set_fact:
@@ -10,23 +10,24 @@
     - name: Determine OPT_VAR
       set_fact:
         opt_var: "var"
-      when: "machine_name.stdout | regex_search('m5$', ignorecase=True) or machine_name.stdout | regex_search('bis$', ignorecase=True)"
+      when:
+        - "machine_name.stdout | regex_search('m5$', ignorecase=True) or machine_name.stdout | regex_search('bis$', ignorecase=True)"
 
     - name: Determine RL_PATH
       set_fact:
         rl_path: "/dev/rl"
       when:
-        - "/dev/rl_microservices" not in lookup('fileglob', '/dev/*')
-        - "/dev/rocky" not in lookup('fileglob', '/dev/*')
-        - "/dev/rocky" not in lookup('fileglob', '/dev/*')
-		
-	  - name: Check RL_PATH and exit if not found
-      fail:
-        msg: "RL path not found"
-      when: rl_path == ""
+        - "/dev/rl" in lookup('fileglob', '/dev/*')"
+        - "/dev/rl_microservices" not in lookup('fileglob', '/dev/*')"
+        - "/dev/rocky" not in lookup('fileglob', '/dev/*')"
 
-    - name: Extend logical volume
-      command: "lvextend -L {{ f_size }} {{ rl_path }}/{{ opt_var }}"
+  - name: Check RL_PATH and exit if not found
+    fail:
+      msg: "RL path not found"
+    when: rl_path == ""
 
-    - name: Grow XFS filesystem
-      command: "xfs_growfs {{ rl_path }}/{{ opt_var }}"
+  - name: Extend logical volume
+    command: "lvextend -L {{ f_size }} {{ rl_path }}/{{ opt_var }}"
+
+  - name: Grow XFS filesystem
+    command: "xfs_growfs {{ rl_path }}/{{ opt_var }}"
