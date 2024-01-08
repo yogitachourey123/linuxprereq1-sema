@@ -2,39 +2,45 @@
 - name: Resize directory
   hosts: all
   tasks:
+    # Get machine name
     - name: Get machine name
       command: "hostname -s"
       register: machine_name
+    # Determine OPT_VAR
     - name: Determine OPT_VAR
       set_fact:
         opt_var: "opt"
-       when:
-         - "'m5$' in machine_name.stdout"
-         - "'bis$' in machine_name.stdout"
+      when:
+        - "'m5$' in machine_name.stdout"
+        - "'bis$' in machine_name.stdout"
+    # Determine RL_PATH
     - name: Determine RL_PATH
       set_fact:
         rl_path: "/dev/rl"
       when: "'/dev/rl' in lookup('fileglob', '/dev/*')"
       register: rl_path_check
+    # Set RL_PATH to rl_microservices if rl_path is not set
     - name: Set RL_PATH to rl_microservices if rl_path is not set
       set_fact:
         rl_path: "/dev/rl_microservices"
       when:
         - "rl_path == ''"
         - "'/dev/rl_microservices' in lookup('fileglob', '/dev/*')"
+    # Set RL_PATH to rocky if rl_path is not set and rl_microservices is not set
     - name: Set RL_PATH to rocky if rl_path is not set and rl_microservices is not set
       set_fact:
         rl_path: "/dev/rocky"
       when:
         - "rl_path == ''"
         - "'/dev/rl_microservices' not in lookup('fileglob', '/dev/*')"
+    # Check RL_PATH and exit if not found
     - name: Check RL_PATH and exit if not found
       fail:
         msg: "RL path not found"
       when: rl_path == ""
-
+    # Extend logical volume
     - name: Extend logical volume
-      command: "lvextend -L {{ f_size }} {{ rl_path }}/{{ opt_var }}"
-
+      command: "lvextend -L {{ f_size }}" "{{ rl_path }}/{{ opt_var }}"
+    # Grow XFS filesystem
     - name: Grow XFS filesystem
       command: "xfs_growfs {{ rl_path }}/{{ opt_var }}"
