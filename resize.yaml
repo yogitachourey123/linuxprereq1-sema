@@ -8,19 +8,28 @@
         set_fact:
           rl_path: "/dev/rl"
         when:
-          - test -d "/dev/rl"
+          - shell: "test -d /dev/rl"
+            register: rl_exists
+            changed_when: false
+          - rl_exists.rc == 0
 
       - name: Set RL_PATH to /dev/rl_microservices if it exists
         set_fact:
           rl_path: "/dev/rl_microservices"
         when:
-          - test -d "/dev/rl_microservices"
+          - shell: "test -d /dev/rl_microservices"
+            register: rl_microservices_exists
+            changed_when: false
+          - rl_microservices_exists.rc == 0
 
       - name: Set RL_PATH to /dev/rocky if it exists
         set_fact:
           rl_path: "/dev/rocky"
         when:
-          - test -d "/dev/rocky"
+          - shell: "test -d /dev/rocky"
+            register: rocky_exists
+            changed_when: false
+          - rocky_exists.rc == 0
 
       - name: Fail if no RL path found
         fail:
@@ -29,8 +38,8 @@
 
     - name: Extend logical volume
       command: "lvextend -L {{ fs_size }} {{ rl_path }}"
-      when: rl_path != ''  # Only execute if RL_PATH is set
+      when: rl_path != ''
 
     - name: Grow XFS filesystem
       command: "xfs_growfs {{ rl_path }}"
-      when: rl_path != ''  # Only execute if RL_PATH is set
+      when: rl_path != ''
