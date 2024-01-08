@@ -40,7 +40,7 @@
       when: rl_path == ""
     # Extend logical volume
     - name: Extend logical volume
-      command: "lvextend -L "{{ f_size }}" \"{{ rl_path }}/{{ opt_var }}"
+      command: "lvextend -L {{ f_size }} {{ rl_path }}/{{ opt_var }}"
     # Grow XFS filesystem
     - name: Grow XFS filesystem
       command: "xfs_growfs {{ rl_path }}/{{ opt_var }}"
