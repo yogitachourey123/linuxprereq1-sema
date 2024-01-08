@@ -19,8 +19,14 @@
         - "'/dev/rl' in lookup('fileglob', '/dev/*')"
         - "'/dev/rl_microservices' not in lookup('fileglob', '/dev/*')"
         - "'/dev/rocky' not in lookup('fileglob', '/dev/*')"
+		
+	  - name: Check RL_PATH and exit if not found
+      fail:
+        msg: "RL path not found"
+      when: rl_path == ""
 
-    - name: Extend logical volume and grow filesystem
-      lvolextend:
-        logical_volume={{ rl_path }}/{{ opt_var }}
-        size="{{ f_size }}"
+    - name: Extend logical volume
+      command: "lvextend -L {{ f_size }} {{ rl_path }}/{{ opt_var }}"
+
+    - name: Grow XFS filesystem
+      command: "xfs_growfs {{ rl_path }}/{{ opt_var }}"
