@@ -5,7 +5,6 @@
    - name: Check if /dev/rl exists
      command: "test -d /dev/rl"
      register: rl_exists
-     changed_when: false
      ignore_errors: true
 
    - name: Perform actions if /dev/rl exists
