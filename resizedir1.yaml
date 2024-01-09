@@ -10,10 +10,10 @@
      block:
      - debug:
         msg: "RL path exists!"
-     when: rl_exists.rc == 0
+     when: rl_stat.stat.exists
 
    - name: Perform actions if /dev/rl does not exist
      block:
      - debug:
         msg: "RL path does not exist."
-     when: rl_exists.rc != 0
+     when: not rl_stat.stat.exists
