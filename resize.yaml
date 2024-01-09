@@ -14,9 +14,9 @@
     - name: Perform actions if /dev/rl exists
       block:
         - debug: msg="RL path exists!"  # Replace with actual actions
-          when: avaibleRLPath
+          when: rl_exists.rc == 0  # Check the command's exit code directly
 
     - name: Perform actions if /dev/rl does not exist
       block:
         - debug: msg="RL path does not exist."  # Replace with actions for this case
-          when: not avaibleRLPath
+          when: rl_exists.rc != 0  # Invert the condition
