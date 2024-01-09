@@ -11,7 +11,7 @@
       msg: "RL path exists!"
      when: rl_exists.rc == 0
 
-  - name: Perform actions if /dev/rl does not exist
-    debug:
-     msg: "RL path does not exist."
-    when: rl_exists.rc != 0
+   - name: Perform actions if /dev/rl does not exist
+     debug:
+      msg: "RL path does not exist."
+     when: rl_exists.rc != 0
