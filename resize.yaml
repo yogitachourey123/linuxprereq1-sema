@@ -6,7 +6,8 @@
       set_fact:
         avaibleRLPath: true
       when: >-
-        shell: "test -d /dev/rl"
+        # Use 'command' instead of 'shell' for Ansible conditionals
+        command: "test -d /dev/rl"  # Correct usage of 'command' module
         register: rl_exists
         changed_when: false
         rc == 0
@@ -14,9 +15,9 @@
     - name: Perform actions if /dev/rl exists
       block:
         - debug: msg="RL path exists!"  # Replace with actual actions
-          when: rl_exists.rc == 0  # Check the command's exit code directly
+          when: rl_exists.rc == 0
 
     - name: Perform actions if /dev/rl does not exist
       block:
         - debug: msg="RL path does not exist."  # Replace with actions for this case
-          when: rl_exists.rc != 0  # Invert the condition
+          when: rl_exists.rc != 0
