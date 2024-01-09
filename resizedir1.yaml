@@ -3,8 +3,8 @@
   hosts: all
   tasks:
    - name: Check if /dev/rl exists
-    shell: "[ -d /dev/rl ]"
-    register: rl_exists
+     shell: "[ -d /dev/rl ]"
+     register: rl_exists
 
    - name: Perform actions if /dev/rl exists
      debug:
