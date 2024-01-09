@@ -2,47 +2,19 @@
 - name: Resize directory
   hosts: all
   tasks:
-    - name: Check for available RL paths
+    - name: Check if /dev/rl exists
+      set_fact:
+        avaibleRLPath: true
+      when: test -d /dev/rl  # Use the test command directly in when clause
+
+    - name: Perform actions if /dev/rl exists
       block:
-        - name: Check if /dev/rl exists
-          shell: "test -d /dev/rl"
-          register: rl_exists
-          changed_when: false
+        - debug: msg="RL path exists!"  # Example action
+        # Add other tasks for rl_exists here
+      when: avaibleRLPath
 
-        - name: Set RL_PATH to /dev/rl if it exists
-          set_fact:
-            rl_path: "/dev/rl"
-          when: rl_exists.rc == 0
-
-        - name: Check if /dev/rl_microservices exists
-          shell: "test -d /dev/rl_microservices"
-          register: rl_microservices_exists
-          changed_when: false
-
-        - name: Set RL_PATH to /dev/rl_microservices if it exists
-          set_fact:
-            rl_path: "/dev/rl_microservices"
-          when: rl_microservices_exists.rc == 0
-
-        - name: Check if /dev/rocky exists
-          shell: "test -d /dev/rocky"
-          register: rocky_exists
-          changed_when: false
-
-        - name: Set RL_PATH to /dev/rocky if it exists
-          set_fact:
-            rl_path: "/dev/rocky"
-          when: rocky_exists.rc == 0
-
-        - name: Fail if no RL path found
-          fail:
-            msg: "RL path not found"
-          when: rl_path == ''
-
-    - name: Extend logical volume
-      command: "lvextend -L {{ fs_size }} {{ rl_path }}"
-      when: rl_path != ''
-
-    - name: Grow XFS filesystem
-      command: "xfs_growfs {{ rl_path }}"
-      when: rl_path != ''
+    - name: Perform actions if /dev/rl does not exist
+      block:
+        - debug: msg="RL path does not exist."  # Example action
+        # Add other tasks for rl_doesnotexists here
+      when: not avaibleRLPath
