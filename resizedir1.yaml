@@ -7,10 +7,9 @@
        path: /dev/rl
      register: rl_stat    
    - name: Perform actions if /dev/rl exists
-     block:
-     - debug:
-        msg: "RL path exists!"
-     when: rl_stat.stat.exists
+     debug:
+       msg: "RL path exists!"
+     when: rl_stat.stat.isdir
 
    - name: Perform actions if /dev/rl does not exist
      block:
