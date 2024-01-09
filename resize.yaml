@@ -5,8 +5,9 @@
     - name: Check if /dev/rl exists
       set_fact:
         avaibleRLPath: true
-      when: test -d /dev/rl  # Use the test command directly in when clause
-
+      when: >-
+         shell: "test -d /dev/rl"  # Use the shell module to execute test command
+         register: rl_exists  # Register the output
     - name: Perform actions if /dev/rl exists
       block:
         - debug: msg="RL path exists!"  # Example action
