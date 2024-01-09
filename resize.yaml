@@ -1,22 +1,21 @@
 ---
 - name: Resize directory
-  hosts: all
-  tasks:
-    - name: Check if /dev/rl exists
-      set_fact:
-        avaibleRLPath: true
-      when: >-
-        command: "test -d /dev/rl"  # Execute the command directly
-        register: rl_exists
-        changed_when: false
-        rc == 0
+ hosts: all
+ tasks:
+  - name: Check if /dev/rl exists
+   command: "test -d /dev/rl"
+   register: rl_exists
+   changed_when: false
+   ignore_errors: true
 
-    - name: Perform actions if /dev/rl exists
-      block:
-        - debug: msg="RL path exists!"  # Replace with actual actions
-          when: rl_exists.rc == 0
+  - name: Perform actions if /dev/rl exists
+   block:
+    - debug:
+      msg: "RL path exists!"
+     when: rl_exists.rc == 0
 
-    - name: Perform actions if /dev/rl does not exist
-      block:
-        - debug: msg="RL path does not exist."  # Replace with actions for this case
-          when: rl_exists.rc != 0
+  - name: Perform actions if /dev/rl does not exist
+   block:
+    - debug:
+      msg: "RL path does not exist."
+     when: rl_exists.rc != 0
