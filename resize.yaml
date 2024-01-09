@@ -6,16 +6,17 @@
       set_fact:
         avaibleRLPath: true
       when: >-
-         shell: "test -d /dev/rl"  # Use the shell module to execute test command
-         register: rl_exists  # Register the output
+        shell: "test -d /dev/rl"
+        register: rl_exists
+        changed_when: false
+        rc == 0
+
     - name: Perform actions if /dev/rl exists
       block:
-        - debug: msg="RL path exists!"  # Example action
-        # Add other tasks for rl_exists here
-      when: avaibleRLPath
+        - debug: msg="RL path exists!"  # Replace with actual actions
+          when: avaibleRLPath
 
     - name: Perform actions if /dev/rl does not exist
       block:
-        - debug: msg="RL path does not exist."  # Example action
-        # Add other tasks for rl_doesnotexists here
-      when: not avaibleRLPath
+        - debug: msg="RL path does not exist."  # Replace with actions for this case
+          when: not avaibleRLPath
